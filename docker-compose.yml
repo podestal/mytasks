@@ -6,10 +6,14 @@ services:
     working_dir: /app
     volumes:
       - .:/app
+      - app_data:/app/data
     ports:
       - "3000:3000"
     tty: true
     stdin_open: true
-    # Environment variables (add your own later)
     environment:
       - NODE_ENV=development
+      - SQLITE_PATH=/app/data/app.sqlite
+
+volumes:
+  app_data:
