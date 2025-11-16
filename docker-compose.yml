@@ -1,0 +1,15 @@
+
+services:
+  bun:
+    build: .
+    container_name: bun-dev
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    tty: true
+    stdin_open: true
+    # Environment variables (add your own later)
+    environment:
+      - NODE_ENV=development
