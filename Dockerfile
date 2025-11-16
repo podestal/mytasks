@@ -4,7 +4,7 @@ FROM oven/bun:latest
 # Install dependencies for better-auth
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      python3 build-essential pkg-config && \
+      python3 build-essential pkg-config sqlite3 && \
     rm -rf /var/lib/apt/lists/*
 
 # Set working directory

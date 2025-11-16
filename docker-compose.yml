@@ -6,7 +6,6 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-      - app_data:/app/data
     ports:
       - "3000:3000"
     tty: true
@@ -14,5 +13,3 @@ services:
     environment:
       - NODE_ENV=development
 
-volumes:
-  app_data:
