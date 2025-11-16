@@ -13,7 +13,6 @@ services:
     stdin_open: true
     environment:
       - NODE_ENV=development
-      - SQLITE_PATH=/app/data/app.sqlite
 
 volumes:
   app_data:
