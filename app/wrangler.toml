@@ -1,0 +1,8 @@
+name = "mytasks-server"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "mytasks-db"
+database_id = "a5847e7b-0ed4-4c59-8aa9-fd26ea55ec12"
