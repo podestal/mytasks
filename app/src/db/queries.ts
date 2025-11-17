@@ -12,7 +12,9 @@ export const getProjects = async () => {
 
 
 export const createProject = async (project: Omit<Project, 'id' | 'created_at' | 'updated_at'>) => {
-    return await db
-    .insert(projects)
-    .values(project)
+    const [result] = await db
+        .insert(projects)
+        .values(project)
+        .returning()
+    return result
 }

@@ -13,11 +13,9 @@ app.get('/projects', async (c) => {
 })
 
 app.post('/projects', async (c) => {
-  const project = await createProject(await c.req.json())
-  return c.json({
-    success: true,
-    message: 'Project created successfully',
-    data: project
-  })
+  const body = await c.req.json()
+  const project = await createProject(body)
+  return c.json(project)
 })
+
 export default app
