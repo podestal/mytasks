@@ -24,9 +24,15 @@ export const createProject = async (
     if (!database) {
         throw new Error('Database not available. Use getDb(d1) in Cloudflare Workers or set SQLITE_PATH for local dev.')
     }
-    const [result] = await database
+    const result = await database
         .insert(projects)
         .values(project)
         .returning()
-    return result
+    
+    // returning() returns an array, get the first element
+    if (!result || result.length === 0) {
+        throw new Error('Failed to create project: no result returned')
+    }
+    
+    return result[0]
 }
