@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:migrate:d1": "DRIZZLE_DRIVER=d1 drizzle-kit migrate"
   },
   "dependencies": {
     "@libsql/client": "^0.15.15",
