@@ -1,6 +1,6 @@
 import type { Context } from 'hono'
 import type { D1Database } from '@cloudflare/workers-types'
-import { getProjects, createProject, getProjectById } from '../db/queries/projects'
+import { getProjects, createProject, getProjectById, updateProject } from '../db/queries/projects'
 
 type Env = {
   DB?: D1Database
@@ -51,6 +51,19 @@ export const getProjectByIdHandler = async (c: Context<{ Bindings: Env }>) => {
   }
 }
 
+// PATCH /api/projects/:id
+export const updateProjectHandler = async (c: Context<{ Bindings: Env }>) => {
+  try {
+    const id = parseInt(c.req.param('id'))
+    const body = await c.req.json()
+    const project = await updateProject(id, body, c.env.DB)
+    return c.json(project)
+  }
+  catch (error: any) {
+    console.error('Error updating project:', error)
+    return c.json({ error: error.message || 'Internal server error' }, 500)
+  }
+}
 // Future handlers (when you add these queries):
 // 
 // GET /api/projects/:id
