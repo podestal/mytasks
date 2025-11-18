@@ -1,6 +1,6 @@
 import type { Context } from 'hono'
 import type { D1Database } from '@cloudflare/workers-types'
-import { getProjects, createProject } from '../db/queries/projects'
+import { getProjects, createProject, getProjectById } from '../db/queries/projects'
 
 type Env = {
   DB?: D1Database
@@ -25,6 +25,28 @@ export const createProjectHandler = async (c: Context<{ Bindings: Env }>) => {
     return c.json(project, 201)
   } catch (error: any) {
     console.error('Error creating project:', error)
+    return c.json({ error: error.message || 'Internal server error' }, 500)
+  }
+}
+
+// GET /api/projects/:id
+export const getProjectByIdHandler = async (c: Context<{ Bindings: Env }>) => {
+  try {
+    const id = parseInt(c.req.param('id'))
+    
+    if (isNaN(id)) {
+      return c.json({ error: 'Invalid project ID' }, 400)
+    }
+    
+    const project = await getProjectById(id, c.env.DB)
+    
+    if (!project) {
+      return c.json({ error: 'Project not found' }, 404)
+    }
+    
+    return c.json(project)
+  } catch (error: any) {
+    console.error('Error fetching project:', error)
     return c.json({ error: error.message || 'Internal server error' }, 500)
   }
 }
