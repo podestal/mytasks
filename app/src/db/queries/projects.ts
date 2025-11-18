@@ -92,3 +92,22 @@ export const createProject = async (
     return result[0]
 }
 
+export const deleteProject = async (id: number, d1?: D1Database): Promise<void> => {
+    /**
+     * Delete a project
+     * @param id - Project ID
+     * @param d1 - D1Database instance
+     * @returns Promise<void>
+     */
+    const database = d1 ? getDb(d1) : db
+    if (!database) {
+        throw new Error('Database not available. Use getDb(d1) in Cloudflare Workers or set SQLITE_PATH for local dev.')
+    }
+    const result: Project[] = await database
+        .delete(projects)
+        .where(eq(projects.id, id))
+        .returning()
+    if (!result || result.length === 0) {
+        throw new Error('Failed to delete project: no result returned')
+    }
+}

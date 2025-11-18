@@ -1,6 +1,6 @@
 import type { Context } from 'hono'
 import type { D1Database } from '@cloudflare/workers-types'
-import { getProjects, createProject, getProjectById, updateProject } from '../db/queries/projects'
+import { getProjects, createProject, getProjectById, updateProject, deleteProject } from '../db/queries/projects'
 
 type Env = {
   DB?: D1Database
@@ -64,6 +64,20 @@ export const updateProjectHandler = async (c: Context<{ Bindings: Env }>) => {
     return c.json({ error: error.message || 'Internal server error' }, 500)
   }
 }
+
+// DELETE /api/projects/:id
+export const deleteProjectHandler = async (c: Context<{ Bindings: Env }>) => {
+  try {
+    const id = parseInt(c.req.param('id'))
+    await deleteProject(id, c.env.DB)
+    return c.json({ success: true })
+  }
+  catch (error: any) {
+    console.error('Error deleting project:', error)
+    return c.json({ error: error.message || 'Internal server error' }, 500)
+  }
+}
+  
 // Future handlers (when you add these queries):
 // 
 // GET /api/projects/:id
