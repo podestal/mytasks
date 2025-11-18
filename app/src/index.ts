@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import projectsRouter from './routes/projects'
 import type { D1Database } from '@cloudflare/workers-types'
+import sprintsRouter from './routes/sprints'
 
 type Env = {
   DB?: D1Database
@@ -15,5 +16,6 @@ app.get('/', (c) => {
 
 // Mount project routes
 app.route('/projects', projectsRouter)
+app.route('/sprints', sprintsRouter)
 
 export default app
