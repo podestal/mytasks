@@ -1,8 +1,8 @@
-import { db, getDb } from './db'
-import { projects } from './schema'
+import { D1Database } from '@cloudflare/workers-types'
+import { getDb, db } from '../db'
+import { projects } from '../schema'
 import { desc } from 'drizzle-orm'
-import { Project } from './types'
-import type { D1Database } from '@cloudflare/workers-types'
+import { Project } from '../types'
 
 // Unified queries that work with both local SQLite and D1
 export const getProjects = async (d1?: D1Database) => {
