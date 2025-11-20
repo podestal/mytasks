@@ -2,6 +2,7 @@ import { D1Database } from '@cloudflare/workers-types'
 import { getDb, db } from '../db'
 import { Sprint } from '../types'
 import { sprint } from '../schema'
+import { eq } from 'drizzle-orm'
 
 export const createSprint = async (sprintData: Omit<Sprint, 'id' | 'created_at' | 'updated_at'>, d1?: D1Database): Promise<Sprint> => {
     /**
@@ -22,4 +23,38 @@ export const createSprint = async (sprintData: Omit<Sprint, 'id' | 'created_at' 
         throw new Error('Failed to create sprint: no result returned')
     }
     return result
+}
+
+export const getAllSprints = async (d1?: D1Database): Promise<Sprint[]> => {
+    const database = d1 ? getDb(d1) : db
+    if (!database) {
+        throw new Error('Database not available. Use getDb(d1) in Cloudflare Workers or set SQLITE_PATH for local dev.')
+    }
+    const result: Sprint[] = await database
+        .select()
+        .from(sprint)
+    return result
+}
+
+export const updateSprint = async (id: number, sprintData: Omit<Sprint, 'id' | 'created_at' | 'updated_at'>, d1?: D1Database): Promise<Sprint> => {
+    const database = d1 ? getDb(d1) : db
+    if (!database) {
+        throw new Error('Database not available. Use getDb(d1) in Cloudflare Workers or set SQLITE_PATH for local dev.')
+    }
+    const result: Sprint = await database
+        .update(sprint)
+        .set(sprintData)
+        .where(eq(sprint.id, id))
+        .returning()
+    return result
+}
+
+export const deleteSprint = async (id: number, d1?: D1Database): Promise<void> => {
+    const database = d1 ? getDb(d1) : db
+    if (!database) {
+        throw new Error('Database not available. Use getDb(d1) in Cloudflare Workers or set SQLITE_PATH for local dev.')
+    }
+    await database
+        .delete(sprint)
+        .where(eq(sprint.id, id))
 }
