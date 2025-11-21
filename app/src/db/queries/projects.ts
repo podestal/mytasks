@@ -1,7 +1,7 @@
 import { D1Database } from '@cloudflare/workers-types'
 import { getDb, db } from '../db'
-import { projects } from '../schema'
-import { desc, eq } from 'drizzle-orm'
+import { projects, sprint } from '../schema'
+import { desc, eq, sql } from 'drizzle-orm'
 import { Project } from '../types'
 
 export const getProjects = async (d1?: D1Database): Promise<Project[]> => {
@@ -15,9 +15,19 @@ export const getProjects = async (d1?: D1Database): Promise<Project[]> => {
         throw new Error('Database not available. Use getDb(d1) in Cloudflare Workers or set SQLITE_PATH for local dev.')
     }
     return await database
-        .select()
+        .select({
+            id: projects.id,
+            name: projects.name,
+            description: projects.description,
+            created_at: projects.created_at,
+            updated_at: projects.updated_at,
+            totalSprints: sql<number>`COALESCE(COUNT(${sprint.id}), 0)`.as('totalSprints'),
+            completedSprints: sql<number>`COALESCE(SUM(CASE WHEN ${sprint.status} = 'D' THEN 1 ELSE 0 END), 0)`.as('completedSprints')
+        })
         .from(projects)
-        .orderBy(desc(projects.created_at))
+        .leftJoin(sprint, eq(projects.id, sprint.project_id))
+        .groupBy(projects.id, projects.name, projects.description, projects.created_at, projects.updated_at)
+        .orderBy(desc(projects.updated_at))
 }
 
 export const getProjectById = async (id: number, d1?: D1Database): Promise<Project | undefined> => {

@@ -4,6 +4,8 @@ export type Project = {
     description: string
     created_at: string
     updated_at: string
+    totalSrpints?: number
+    completedSprints?: number
 }
 
 export type Sprint = {
