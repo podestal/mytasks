@@ -1,5 +1,5 @@
 import { Context } from "hono"
-import { createSprint, deleteSprint, getAllSprints, updateSprint } from "../db/queries/sprints"
+import { createSprint, deleteSprint, getAllSprints, getSprintsByProjectId, updateSprint } from "../db/queries/sprints"
 import { D1Database } from "@cloudflare/workers-types"
 
 type Env = {
@@ -25,6 +25,22 @@ export const getAllSprintsHandler = async (c: Context<{ Bindings: Env }>) => {
       console.error('Error getting sprints:', error)
       return c.json({ error: error.message || 'Internal server error' }, 500)
     }
+}
+
+export const getSprintsByProjectIdHandler = async (c: Context<{ Bindings: Env }>) => {
+  try {
+      const projectId = parseInt(c.req.param('id'))
+
+      if (isNaN(projectId)) {
+          return c.json({ error: 'Invalid project ID' }, 400)
+      }
+      
+      const sprints = await getSprintsByProjectId(projectId, c.env.DB)
+      return c.json(sprints)
+  } catch (error: any) {
+      console.error('Error fetching sprints by project ID:', error)
+      return c.json({ error: error.message || 'Internal server error' }, 500)
+  }
 }
   
 export const updateSprintHandler = async (c: Context<{ Bindings: Env }>) => {

@@ -2,7 +2,7 @@ import { D1Database } from '@cloudflare/workers-types'
 import { getDb, db } from '../db'
 import { Sprint } from '../types'
 import { sprint } from '../schema'
-import { eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 
 export const createSprint = async (sprintData: Omit<Sprint, 'id' | 'created_at' | 'updated_at'>, d1?: D1Database): Promise<Sprint> => {
     /**
@@ -22,6 +22,19 @@ export const createSprint = async (sprintData: Omit<Sprint, 'id' | 'created_at' 
     if (!result) {
         throw new Error('Failed to create sprint: no result returned')
     }
+    return result
+}
+
+export const getSprintsByProjectId = async (projectId: number, d1?: D1Database): Promise<Sprint[]> => {
+    const database = d1 ? getDb(d1) : db
+    if (!database) {
+        throw new Error('Database not available. Use getDb(d1) in Cloudflare Workers or set SQLITE_PATH for local dev.')
+    }
+    const result: Sprint[] = await database
+        .select()
+        .from(sprint)
+        .where(eq(sprint.project_id, projectId))
+        .orderBy(desc(sprint.updated_at))
     return result
 }
 

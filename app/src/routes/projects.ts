@@ -7,6 +7,7 @@ import {
     deleteProjectHandler
 } from '../handlers/projects'
 import type { D1Database } from '@cloudflare/workers-types'
+import { getSprintsByProjectIdHandler } from '../handlers/sprints'
 
 type Env = {
   DB?: D1Database
@@ -20,5 +21,7 @@ projectsRouter.post('/', createProjectHandler)         // POST /api/projects
 projectsRouter.get('/:id', getProjectByIdHandler)     // GET /api/projects/:id
 projectsRouter.patch('/:id', updateProjectHandler) // PATCH /api/projects/:id
 projectsRouter.delete('/:id', deleteProjectHandler) // DELETE /api/projects/:id
+
+projectsRouter.get('/:id/sprints', getSprintsByProjectIdHandler) // GET /api/projects/:id/sprints
 
 export default projectsRouter
