@@ -5,6 +5,7 @@ import projectsRouter from './routes/projects'
 import type { D1Database } from '@cloudflare/workers-types'
 import sprintsRouter from './routes/sprints'
 import { corsMiddleware } from './middleware/cors'
+import tasksRouter from './routes/tasks'
 
 type Env = {
   DB?: D1Database
@@ -27,6 +28,7 @@ app.get('/', (c) => {
 // Mount project routes
 app.route('/projects', projectsRouter)
 app.route('/sprints', sprintsRouter)
+app.route('/tasks', tasksRouter)
 
 // Explicit server setup for Bun (ensures logs work properly)
 if (typeof Bun !== 'undefined') {

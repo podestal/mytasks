@@ -15,6 +15,13 @@
       "when": 1763475226711,
       "tag": "0001_sloppy_black_tarantula",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1763810532460,
+      "tag": "0002_chemical_spectrum",
+      "breakpoints": true
     }
   ]
 }

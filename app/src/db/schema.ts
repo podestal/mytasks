@@ -19,3 +19,14 @@ export const sprint = sqliteTable('sprints', {
   created_at: text("created_at").default(sql`CURRENT_TIMESTAMP`),
   updated_at: text("updated_at").default(sql`CURRENT_TIMESTAMP`),
 })
+
+
+export const tasks = sqliteTable('tasks', {
+  id: integer('id').primaryKey(),
+  sprint_id: integer('sprint_id').notNull().references(() => sprint.id, { onDelete: 'cascade' }),
+  description: text('description').notNull(),
+  status: text('status').notNull().default('T'), // 'T' = To Do, 'P' = In Progress, 'R' = Review, 'D' = Done
+  priority: text('priority').notNull().default('low'), // 'low' = Low, 'medium' = Medium, 'high' = High
+  created_at: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updated_at: text("updated_at").default(sql`CURRENT_TIMESTAMP`),
+})
