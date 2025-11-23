@@ -25,6 +25,18 @@ export const createSprint = async (sprintData: Omit<Sprint, 'id' | 'created_at' 
     return result
 }
 
+export const getSprintById = async (id: number, d1?: D1Database): Promise<Sprint> => {
+    const database = d1 ? getDb(d1) : db
+    if (!database) {
+        throw new Error('Database not available. Use getDb(d1) in Cloudflare Workers or set SQLITE_PATH for local dev.')
+    }
+    const result: Sprint = await database
+        .select()
+        .from(sprint)
+        .where(eq(sprint.id, id))
+    return result
+}
+
 export const getSprintsByProjectId = async (projectId: number, d1?: D1Database): Promise<Sprint[]> => {
     const database = d1 ? getDb(d1) : db
     if (!database) {

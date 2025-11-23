@@ -1,9 +1,20 @@
 import { Context } from "hono"
-import { createTask } from "../db/queries/tasks"
+import { createTask, getTasksBySprintId } from "../db/queries/tasks"
 import { D1Database } from "@cloudflare/workers-types"
 
 type Env = {
     DB?: D1Database
+}
+
+export const getTasksBySprintIdHandler = async (c: Context<{ Bindings: Env }>) => {
+    try {
+        const sprintId = parseInt(c.req.param('sprintId'))
+        const tasks = await getTasksBySprintId(sprintId, c.env.DB)
+        return c.json(tasks)
+    } catch (error: any) {
+        console.error('Error getting tasks by sprint ID:', error)
+        return c.json({ error: error.message || 'Internal server error' }, 500)
+    }
 }
 
 export const createTaskHandler = async (c: Context<{ Bindings: Env }>) => {

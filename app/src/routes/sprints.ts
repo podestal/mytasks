@@ -3,6 +3,7 @@ import {
     createSprintHandler,
     deleteSprintHandler,
     getAllSprintsHandler,
+    getSprintByIdHandler,
     updateSprintHandler
 } from '../handlers/sprints'
 import type { D1Database } from '@cloudflare/workers-types'
@@ -15,7 +16,8 @@ const sprintsRouter = new Hono<{ Bindings: Env }>()
 
 // Define routes and map them to handlers
 sprintsRouter.post('/', createSprintHandler)         // POST /api/sprints
-sprintsRouter.get('/', getAllSprintsHandler)         // GET /api/sprints
+sprintsRouter.get('/', getAllSprintsHandler)      // GET /api/sprints
+sprintsRouter.get('/:id', getSprintByIdHandler)         // GET /api/sprints/:id
 sprintsRouter.patch('/:id', updateSprintHandler)         // PUT /api/sprints/:id
 sprintsRouter.delete('/:id', deleteSprintHandler)         // DELETE /api/sprints/:id
 export default sprintsRouter

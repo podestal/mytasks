@@ -1,7 +1,20 @@
+import { eq } from "drizzle-orm"
 import { getDb, db } from "../db"
 import { tasks } from "../schema"
 import { Task } from "../types"
 import { D1Database } from "@cloudflare/workers-types"
+
+export const getTasksBySprintId = async (sprintId: number, d1?: D1Database): Promise<Task[]> => {
+    const database = d1 ? getDb(d1) : db
+    if (!database) {
+        throw new Error('Database not available. Use getDb(d1) in Cloudflare Workers or set SQLITE_PATH for local dev.')
+    }
+    const result: Task[] = await database
+        .select()
+        .from(tasks)
+        .where(eq(tasks.sprint_id, sprintId))
+    return result
+}
 
 export const createTask = async (task: Task, d1?: D1Database): Promise<Task> => {
     /**

@@ -1,5 +1,5 @@
 import { Context } from "hono"
-import { createSprint, deleteSprint, getAllSprints, getSprintsByProjectId, updateSprint } from "../db/queries/sprints"
+import { createSprint, deleteSprint, getAllSprints, getSprintById, getSprintsByProjectId, updateSprint } from "../db/queries/sprints"
 import { D1Database } from "@cloudflare/workers-types"
 
 type Env = {
@@ -23,6 +23,17 @@ export const getAllSprintsHandler = async (c: Context<{ Bindings: Env }>) => {
       return c.json(sprints)
     } catch (error: any) {
       console.error('Error getting sprints:', error)
+      return c.json({ error: error.message || 'Internal server error' }, 500)
+    }
+}
+
+export const getSprintByIdHandler = async (c: Context<{ Bindings: Env }>) => {
+    try {
+      const id = parseInt(c.req.param('id'))
+      const sprint = await getSprintById(id, c.env.DB)
+      return c.json(sprint)
+    } catch (error: any) {
+      console.error('Error getting sprint by ID:', error)
       return c.json({ error: error.message || 'Internal server error' }, 500)
     }
 }
