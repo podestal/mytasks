@@ -16,6 +16,16 @@ export const getTasksBySprintId = async (sprintId: number, d1?: D1Database): Pro
     return result
 }
 
+export const deleteTaskById = async (id: number, d1?: D1Database): Promise<void> => {
+    const database = d1 ? getDb(d1) : db
+    if (!database) {
+        throw new Error('Database not available. Use getDb(d1) in Cloudflare Workers or set SQLITE_PATH for local dev.')
+    }
+    await database
+        .delete(tasks)
+        .where(eq(tasks.id, id))
+}
+
 export const createTask = async (task: Task, d1?: D1Database): Promise<Task> => {
     /**
      * Create a task
