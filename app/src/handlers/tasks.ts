@@ -1,5 +1,5 @@
 import { Context } from "hono"
-import { createTask, deleteTaskById, getTasksBySprintId } from "../db/queries/tasks"
+import { createTask, deleteTaskById, getTasksBySprintId, updateTaskById } from "../db/queries/tasks"
 import { D1Database } from "@cloudflare/workers-types"
 
 type Env = {
@@ -24,6 +24,18 @@ export const createTaskHandler = async (c: Context<{ Bindings: Env }>) => {
         return c.json(task, 201)
     } catch (error: any) {
         console.error('Error creating task:', error)
+        return c.json({ error: error.message || 'Internal server error' }, 500)
+    }
+}
+
+export const updateTaskByIdHandler = async (c: Context<{ Bindings: Env }>) => {
+    try {
+        const id = parseInt(c.req.param('id'))
+        const body = await c.req.json()
+        const task = await updateTaskById(id, body, c.env.DB)
+        return c.json(task, 200)
+    } catch (error: any) {
+        console.error('Error updating task by ID:', error)
         return c.json({ error: error.message || 'Internal server error' }, 500)
     }
 }

@@ -26,6 +26,19 @@ export const deleteTaskById = async (id: number, d1?: D1Database): Promise<void>
         .where(eq(tasks.id, id))
 }
 
+export const updateTaskById = async (id: number, task: Task, d1?: D1Database): Promise<Task> => {
+    const database = d1 ? getDb(d1) : db
+    if (!database) {
+        throw new Error('Database not available. Use getDb(d1) in Cloudflare Workers or set SQLITE_PATH for local dev.')
+    }
+    const result: Task = await database
+        .update(tasks)
+        .set(task)
+        .where(eq(tasks.id, id))
+        .returning()
+    return result
+}
+
 export const createTask = async (task: Task, d1?: D1Database): Promise<Task> => {
     /**
      * Create a task
