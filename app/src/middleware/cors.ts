@@ -1,22 +1,26 @@
 import { cors } from 'hono/cors'
+import type { Context } from 'hono'
 
 // Parse ALLOWED_HOSTS from environment variable
 // Supports comma-separated list: http://localhost:5173,http://example.com
-const getAllowedOrigins = (): string[] => {
-  const allowedHosts = process.env.ALLOWED_HOSTS || ''
+const getAllowedOrigins = (allowedHosts?: string): string[] => {
+  // Try to get from parameter first (Cloudflare Workers c.env), then fallback to process.env (local dev)
+  const hosts = allowedHosts || (typeof process !== 'undefined' ? process.env.ALLOWED_HOSTS : undefined) || ''
 
-
-  if (!allowedHosts) {
+  if (!hosts) {
     return []
   }
   // Split by comma and trim whitespace
-  return allowedHosts.split(',').map(host => host.trim()).filter(Boolean)
+  return hosts.split(',').map(host => host.trim()).filter(Boolean)
 }
 
 // Create CORS middleware with dynamic origin checking
+// Works with both Cloudflare Workers (c.env) and local dev (process.env)
 export const corsMiddleware = cors({
-  origin: (origin) => {
-    const allowedOrigins = getAllowedOrigins()
+  origin: (origin, c: Context) => {
+    // Get ALLOWED_HOSTS from Cloudflare Workers env (c.env) or fallback to process.env for local dev
+    const allowedHosts = c.env?.ALLOWED_HOSTS || (typeof process !== 'undefined' ? process.env.ALLOWED_HOSTS : undefined)
+    const allowedOrigins = getAllowedOrigins(allowedHosts)
     
     // Allow all origins if '*' is in the list (development mode)
     if (allowedOrigins.includes('*')) {

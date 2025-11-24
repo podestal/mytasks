@@ -9,11 +9,16 @@ type Env = {
 // GET /api/projects
 export const getProjectsHandler = async (c: Context<{ Bindings: Env }>) => {
   try {
+    // Pass c.env.DB (undefined locally, D1 in Cloudflare)
+    // getProjects() handles both cases automatically
     const projects = await getProjects(c.env.DB)
     return c.json(projects)
   } catch (error: any) {
     console.error('Error fetching projects:', error)
-    return c.json({ error: error.message || 'Internal server error' }, 500)
+    console.error('Error stack:', error.stack)
+    return c.json({ 
+      error: error.message || 'Internal server error'
+    }, 500)
   }
 }
 

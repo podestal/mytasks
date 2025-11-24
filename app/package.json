@@ -4,7 +4,10 @@
     "dev": "bun run --hot src/index.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:migrate:d1": "DRIZZLE_DRIVER=d1 drizzle-kit migrate"
+    "db:migrate:d1": "DRIZZLE_DRIVER=d1 drizzle-kit migrate",
+    "db:migrate:wrangler": "npx wrangler d1 migrations apply mytasks-db --remote",
+    "deploy": "bunx wrangler deploy",
+    "deploy:migrate": "bun run db:migrate:wrangler && bun run deploy"
   },
   "dependencies": {
     "@libsql/client": "^0.15.15",

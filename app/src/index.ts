@@ -1,4 +1,5 @@
-import 'dotenv/config'
+// Note: dotenv is not needed in Cloudflare Workers (they use c.env)
+// For local dev with Bun, dotenv can be loaded via CLI: bun --env-file=.env run src/index.ts
 import { Hono } from 'hono'
 import { logger } from 'hono/logger'
 import projectsRouter from './routes/projects'
@@ -9,11 +10,24 @@ import tasksRouter from './routes/tasks'
 
 type Env = {
   DB?: D1Database
+  ALLOWED_HOSTS?: string
 }
 
 const app = new Hono<{ Bindings: Env }>().basePath('/api')
 
-const isDev = process.env.NODE_ENV !== 'production'
+// Safe check for NODE_ENV (works in both Workers and local dev)
+const isDev = typeof process !== 'undefined' && process.env.NODE_ENV !== 'production'
+
+// Global error handler
+app.onError((err, c) => {
+  console.error('Global error:', err)
+  console.error('Error stack:', err.stack)
+  return c.json({ 
+    error: err.message || 'Internal server error',
+    // Only show stack in development
+    ...(isDev && { stack: err.stack })
+  }, 500)
+})
 
 app.use('*', logger())
 
@@ -37,8 +51,8 @@ if (typeof Bun !== 'undefined') {
   // Only show detailed logs in development mode
   if (isDev) {
     console.log('🚀 Starting MyTasks API Server...')
-    console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`)
-    console.log(`🌐 CORS allowed hosts: ${process.env.ALLOWED_HOSTS || 'none configured'}`)
+    console.log(`📝 Environment: ${typeof process !== 'undefined' ? process.env.NODE_ENV || 'development' : 'cloudflare-workers'}`)
+    console.log(`🌐 CORS allowed hosts: ${typeof process !== 'undefined' ? process.env.ALLOWED_HOSTS || 'none configured' : 'configured via c.env'}`)
     console.log(`🔗 Server running at http://localhost:${port}`)
     console.log('📊 Request logs will appear below:\n')
   }

@@ -6,7 +6,7 @@ import { Project } from '../types'
 
 export const getProjects = async (d1?: D1Database): Promise<Project[]> => {
     /**
-     * Get all projects
+     * Get all projects with sprint counts
      * @param d1 - D1Database instance
      * @returns Promise<Project[]>
      */
@@ -21,8 +21,8 @@ export const getProjects = async (d1?: D1Database): Promise<Project[]> => {
             description: projects.description,
             created_at: projects.created_at,
             updated_at: projects.updated_at,
-            totalSprints: sql<number>`COALESCE(COUNT(${sprint.id}), 0)`.as('totalSprints'),
-            completedSprints: sql<number>`COALESCE(SUM(CASE WHEN ${sprint.status} = 'D' THEN 1 ELSE 0 END), 0)`.as('completedSprints')
+            totalSprints: sql<number>`COUNT(${sprint.id})`.as('totalSprints'),
+            completedSprints: sql<number>`COUNT(CASE WHEN ${sprint.status} = 'D' THEN 1 END)`.as('completedSprints')
         })
         .from(projects)
         .leftJoin(sprint, eq(projects.id, sprint.project_id))
