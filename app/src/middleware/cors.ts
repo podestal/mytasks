@@ -22,6 +22,11 @@ export const corsMiddleware = cors({
     const allowedHosts = c.env?.ALLOWED_HOSTS || (typeof process !== 'undefined' ? process.env.ALLOWED_HOSTS : undefined)
     const allowedOrigins = getAllowedOrigins(allowedHosts)
     
+    // Debug logging (only in development or if no allowed hosts)
+    if (!allowedHosts || allowedOrigins.length === 0) {
+      console.warn('CORS: No ALLOWED_HOSTS configured. Set it as a secret: wrangler secret put ALLOWED_HOSTS')
+    }
+    
     // Allow all origins if '*' is in the list (development mode)
     if (allowedOrigins.includes('*')) {
       return origin || '*'
@@ -35,6 +40,11 @@ export const corsMiddleware = cors({
     // If no origin header (same-origin request), allow it
     if (!origin) {
       return '*'
+    }
+    
+    // Log rejected origin for debugging
+    if (origin && allowedOrigins.length > 0) {
+      console.warn(`CORS: Origin "${origin}" not in allowed list:`, allowedOrigins)
     }
     
     // Reject origin not in allowed list - return null to deny
